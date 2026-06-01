@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Mis Enlaces</title>
+</head>
+<body>
+    <h1>Mis Enlaces</h1>
+    <ul>
+        {% for link in links %}
+        <li><a href="{{ link.url }}">{{ link.name }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
