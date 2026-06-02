@@ -11,7 +11,7 @@ def show_links():
         {"name": "Flask", "url": "https://flask.palletsprojects.com/"},
         {"name": "Wikipedia", "url": "https://www.wikipedia.org/"},
     ]
-    return render_template("links.html", links=links)
+    return render_template("index.html", links=links)
 
 
 if __name__ == "__main__":
