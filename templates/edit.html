@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Editar Enlace</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="page">
+        <section class="profile">
+            <p class="eyebrow">MyLink Page</p>
+            <h1>Editar Enlace</h1>
+            <p class="bio">Actualiza el nombre del sitio o la URL guardada.</p>
+        </section>
+
+        <form class="link-form" action="{{ url_for('update_link', link_index=link_index) }}" method="post">
+            <label for="site-name">Nombre del sitio</label>
+            <input id="site-name" name="site_name" type="text" value="{{ link.name }}" required>
+
+            <label for="site-url">URL</label>
+            <input id="site-url" name="site_url" type="url" value="{{ link.url }}" required>
+
+            <button type="submit">Guardar cambios</button>
+            <a class="cancel-link" href="{{ url_for('show_links') }}">Cancelar</a>
+        </form>
+    </main>
+</body>
+</html>

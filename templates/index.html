@@ -2,25 +2,41 @@
 <html lang="es">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Mis Enlaces</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Mis Enlaces</h1>
+    <main class="page">
+        <section class="profile">
+            <p class="eyebrow">MyLink Page</p>
+            <h1>Mis Enlaces</h1>
+            <p class="bio">Una colecci&oacute;n simple de sitios &uacute;tiles para visitar y compartir.</p>
+        </section>
 
-    <form action="{{ url_for('add_link') }}" method="post">
-        <label for="site-name">Nombre del sitio</label>
-        <input id="site-name" name="site_name" type="text" required>
+        <form class="link-form" action="{{ url_for('add_link') }}" method="post">
+            <label for="site-name">Nombre del sitio</label>
+            <input id="site-name" name="site_name" type="text" required>
 
-        <label for="site-url">URL</label>
-        <input id="site-url" name="site_url" type="url" required>
+            <label for="site-url">URL</label>
+            <input id="site-url" name="site_url" type="url" required>
 
-        <button type="submit">añadir la URL</button>
-    </form>
+            <button type="submit">A&ntilde;adir la URL</button>
+        </form>
 
-    <ul>
-        {% for link in links %}
-        <li><a href="{{ link.url }}">{{ link.name }}</a></li>
-        {% endfor %}
-    </ul>
+        <ul class="link-list">
+            {% for link in links %}
+            <li class="link-card">
+                <a href="{{ link.url }}">{{ link.name }}</a>
+                <div class="card-actions">
+                    <a class="edit-button" href="{{ url_for('edit_link', link_index=loop.index0) }}">Editar</a>
+                    <form class="delete-form" action="{{ url_for('delete_link', link_index=loop.index0) }}" method="post">
+                        <button class="delete-button" type="submit">Borrar</button>
+                    </form>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </main>
 </body>
 </html>
