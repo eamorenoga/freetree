@@ -26,8 +26,27 @@
 
         <ul class="link-list">
             {% for link in links %}
-            <li class="link-card">
-                <a href="{{ link.url }}">{{ link.name }}</a>
+            {% set has_title = link.title != unavailable_text %}
+            {% set has_description = link.description != unavailable_text %}
+            {% set has_image = link.image_url != unavailable_text %}
+            {% set is_rich = has_title or has_description or has_image %}
+            <li class="link-card {% if is_rich %}rich-card{% else %}simple-card{% endif %}">
+                {% if is_rich %}
+                <article class="rich-link">
+                    {% if has_image %}
+                    <img class="link-image" src="{{ link.image_url }}" alt="">
+                    {% endif %}
+                    <div class="rich-link-content">
+                        <h2>{{ link.title if has_title else link.name }}</h2>
+                        {% if has_description %}
+                        <p>{{ link.description }}</p>
+                        {% endif %}
+                        <a class="source-link" href="{{ link.url }}">{{ link.url }}</a>
+                    </div>
+                </article>
+                {% else %}
+                <a class="simple-link" href="{{ link.url }}">{{ link.name }}</a>
+                {% endif %}
                 <div class="card-actions">
                     <a class="edit-button" href="{{ url_for('edit_link', link_index=loop.index0) }}">Editar</a>
                     <form class="delete-form" action="{{ url_for('delete_link', link_index=loop.index0) }}" method="post">

@@ -22,7 +22,7 @@ body {
 }
 
 .page {
-    width: min(100% - 32px, 600px);
+    width: min(100% - 32px, 960px);
     margin: 0 auto;
     padding: 48px 0;
 }
@@ -109,28 +109,85 @@ button:hover {
 }
 
 .link-card {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 14px;
-    padding: 16px 18px;
     box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
 }
 
-.link-card a {
+.simple-card {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 18px;
+}
+
+.rich-card {
+    display: grid;
+    gap: 0;
+    overflow: hidden;
+}
+
+.rich-link {
+    min-width: 0;
+}
+
+.link-image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    background: var(--surface-muted);
+}
+
+.rich-link-content {
+    display: grid;
+    gap: 10px;
+    padding: 16px 18px;
+}
+
+.rich-link h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+
+.rich-link p {
+    margin: 0;
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.simple-link,
+.source-link {
     display: block;
     min-width: 0;
     color: var(--primary);
-    font-size: 18px;
     font-weight: 700;
     text-decoration: none;
     overflow-wrap: anywhere;
 }
 
-.link-card a:hover {
+.simple-link {
+    font-size: 18px;
+}
+
+.source-link {
+    margin-top: 4px;
+    font-size: 14px;
+}
+
+.rich-card .card-actions {
+    padding: 0 18px 16px;
+}
+
+.simple-link:hover,
+.source-link:hover {
     color: var(--primary-dark);
     text-decoration: underline;
 }
@@ -188,4 +245,16 @@ button:hover {
 .cancel-link:hover {
     color: var(--text);
     text-decoration: underline;
+}
+
+@media (max-width: 760px) {
+    .simple-card {
+        grid-template-columns: 1fr;
+        align-items: start;
+    }
+
+    .card-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
 }
