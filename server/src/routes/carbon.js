@@ -1,27 +1,28 @@
 const express = require("express");
 const prisma = require("../lib/prisma");
+const { mapCarbonFootprint } = require("../lib/mappers");
 const { requireAuth } = require("../middleware/auth");
 
 const router = express.Router();
 
 router.get("/", requireAuth, async (request, response, next) => {
   try {
-    const userTrees = await prisma.userTree.findMany({
+    const purchases = await prisma.treePurchase.findMany({
       where: { userId: request.user.id },
-      include: { tree: true }
+      include: { treeProduct: true }
     });
-    const records = await prisma.carbonRecord.findMany({
+    const records = await prisma.carbonFootprint.findMany({
       where: { userId: request.user.id },
-      orderBy: { createdAt: "desc" }
+      orderBy: { calculationDate: "desc" }
     });
-    const estimatedKgCo2 = userTrees.reduce((sum, userTree) => sum + userTree.tree.estimatedCo2, 0);
+    const estimatedKgCo2 = purchases.reduce((sum, purchase) => sum + purchase.treeProduct.estimatedKgCo2PerYear, 0);
 
     response.json({
       summary: {
-        treesCount: userTrees.length,
+        treesCount: purchases.length,
         estimatedKgCo2
       },
-      records
+      records: records.map(mapCarbonFootprint)
     });
   } catch (error) {
     next(error);
@@ -30,22 +31,22 @@ router.get("/", requireAuth, async (request, response, next) => {
 
 router.post("/", requireAuth, async (request, response, next) => {
   try {
-    const userTrees = await prisma.userTree.findMany({
+    const purchases = await prisma.treePurchase.findMany({
       where: { userId: request.user.id },
-      include: { tree: true }
+      include: { treeProduct: true }
     });
-    const estimatedKgCo2 = userTrees.reduce((sum, userTree) => sum + userTree.tree.estimatedCo2, 0);
+    const estimatedKgCo2 = purchases.reduce((sum, purchase) => sum + purchase.treeProduct.estimatedKgCo2PerYear, 0);
 
-    const record = await prisma.carbonRecord.create({
+    const record = await prisma.carbonFootprint.create({
       data: {
         userId: request.user.id,
-        treesCount: userTrees.length,
         estimatedKgCo2,
+        accumulatedKgCo2: estimatedKgCo2,
         notes: request.body.notes || "Calculo generado desde el dashboard"
       }
     });
 
-    response.status(201).json({ record });
+    response.status(201).json({ record: mapCarbonFootprint(record) });
   } catch (error) {
     next(error);
   }

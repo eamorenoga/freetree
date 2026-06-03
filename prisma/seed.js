@@ -1,113 +1,192 @@
 const bcrypt = require("bcryptjs");
-const { PrismaClient, Role, UserTreeStatus } = require("@prisma/client");
+const { PrismaClient, PaymentStatus, TreeStatus, UserRole } = require("@prisma/client");
 
 const prisma = new PrismaClient();
+
+async function upsertProduct(product) {
+  const { id, ...data } = product;
+
+  return prisma.treeProduct.upsert({
+    where: { id },
+    update: data,
+    create: product
+  });
+}
 
 async function main() {
   const passwordHash = await bcrypt.hash("Terrabio123!", 10);
 
+  await Promise.all([
+    prisma.role.upsert({
+      where: { name: UserRole.CLIENTE },
+      update: { description: "Usuario comprador de arboles y consultor de seguimiento ambiental." },
+      create: {
+        name: UserRole.CLIENTE,
+        description: "Usuario comprador de arboles y consultor de seguimiento ambiental."
+      }
+    }),
+    prisma.role.upsert({
+      where: { name: UserRole.ADMIN },
+      update: { description: "Administrador con permisos para catalogo, fotos y seguimiento." },
+      create: {
+        name: UserRole.ADMIN,
+        description: "Administrador con permisos para catalogo, fotos y seguimiento."
+      }
+    })
+  ]);
+
   const admin = await prisma.user.upsert({
     where: { email: "admin@terrabiocol.com" },
-    update: {},
+    update: { passwordHash, role: UserRole.ADMIN },
     create: {
       name: "Administracion TerraBioCol",
       email: "admin@terrabiocol.com",
       passwordHash,
-      role: Role.ADMIN
+      role: UserRole.ADMIN
     }
   });
 
   const cliente = await prisma.user.upsert({
     where: { email: "cliente@terrabiocol.com" },
-    update: {},
+    update: { passwordHash, role: UserRole.CLIENTE },
     create: {
       name: "Cliente Demo",
       email: "cliente@terrabiocol.com",
       passwordHash,
-      role: Role.CLIENTE
+      role: UserRole.CLIENTE
     }
   });
 
-  const trees = await Promise.all([
-    prisma.tree.upsert({
-      where: { id: "seed-guayacan" },
-      update: {},
-      create: {
-        id: "seed-guayacan",
-        species: "Guayacan amarillo",
-        description: "Arbol nativo ornamental que apoya polinizadores y mejora corredores verdes urbanos.",
-        price: 69000,
-        imageUrl: "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?auto=format&fit=crop&w=1200&q=80",
-        estimatedCo2: 120,
-        stock: 45
-      }
+  const products = await Promise.all([
+    upsertProduct({
+      id: "product-guayacan",
+      name: "Guayacan amarillo restaurador",
+      species: "Guayacan amarillo",
+      description: "Arbol nativo ornamental que apoya polinizadores y mejora corredores verdes urbanos.",
+      price: 69000,
+      imageUrl: "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?auto=format&fit=crop&w=1200&q=80",
+      estimatedKgCo2PerYear: 120,
+      stock: 45,
+      isActive: true
     }),
-    prisma.tree.upsert({
-      where: { id: "seed-cedro" },
-      update: {},
-      create: {
-        id: "seed-cedro",
-        species: "Cedro rosado",
-        description: "Especie de alto valor ecologico para restauracion y captura de carbono a largo plazo.",
-        price: 89000,
-        imageUrl: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=1200&q=80",
-        estimatedCo2: 180,
-        stock: 30
-      }
+    upsertProduct({
+      id: "product-cedro",
+      name: "Cedro rosado de restauracion",
+      species: "Cedro rosado",
+      description: "Especie de alto valor ecologico para restauracion y captura de carbono a largo plazo.",
+      price: 89000,
+      imageUrl: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=1200&q=80",
+      estimatedKgCo2PerYear: 180,
+      stock: 30,
+      isActive: true
     }),
-    prisma.tree.upsert({
-      where: { id: "seed-yarumo" },
-      update: {},
-      create: {
-        id: "seed-yarumo",
-        species: "Yarumo",
-        description: "Arbol pionero ideal para recuperacion de suelos y refugio de fauna local.",
-        price: 54000,
-        imageUrl: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1200&q=80",
-        estimatedCo2: 95,
-        stock: 60
-      }
+    upsertProduct({
+      id: "product-yarumo",
+      name: "Yarumo pionero",
+      species: "Yarumo",
+      description: "Arbol pionero ideal para recuperacion de suelos y refugio de fauna local.",
+      price: 54000,
+      imageUrl: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1200&q=80",
+      estimatedKgCo2PerYear: 95,
+      stock: 60,
+      isActive: true
     })
   ]);
 
-  const assignedTree = await prisma.userTree.upsert({
-    where: { id: "seed-user-tree" },
+  const purchase = await prisma.treePurchase.upsert({
+    where: { id: "purchase-demo-guayacan" },
     update: {},
     create: {
-      id: "seed-user-tree",
+      id: "purchase-demo-guayacan",
       userId: cliente.id,
-      treeId: trees[0].id,
-      location: "Reserva La Esperanza, Cundinamarca",
+      treeProductId: products[0].id,
+      quantity: 1,
+      unitPrice: products[0].price,
+      total: products[0].price,
+      status: TreeStatus.GROWING,
       plantedAt: new Date("2026-05-12"),
-      status: UserTreeStatus.EN_CRECIMIENTO
+      location: "Reserva La Esperanza, Cundinamarca"
     }
   });
 
-  await prisma.trackingEvent.upsert({
-    where: { id: "seed-tracking-event" },
+  await prisma.payment.upsert({
+    where: { reference: "PAY-DEMO-0001" },
     update: {},
     create: {
-      id: "seed-tracking-event",
-      userTreeId: assignedTree.id,
-      title: "Primer control de crecimiento",
-      description: "El arbol presenta buen follaje y humedad estable en el suelo.",
-      eventDate: new Date("2026-06-01")
+      treePurchaseId: purchase.id,
+      provider: "SIMULATED",
+      reference: "PAY-DEMO-0001",
+      amount: purchase.total,
+      status: PaymentStatus.APPROVED,
+      paidAt: new Date("2026-05-10")
     }
   });
 
-  await prisma.carbonRecord.upsert({
-    where: { id: "seed-carbon-record" },
+  await prisma.qRCode.upsert({
+    where: { code: "TBC-QR-DEMO-GUAYACAN-0001" },
     update: {},
     create: {
-      id: "seed-carbon-record",
+      treePurchaseId: purchase.id,
+      code: "TBC-QR-DEMO-GUAYACAN-0001",
+      imageUrl: "https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=TBC-QR-DEMO-GUAYACAN-0001"
+    }
+  });
+
+  const tracking = await prisma.treeTracking.upsert({
+    where: { id: "tracking-demo-guayacan-001" },
+    update: {},
+    create: {
+      id: "tracking-demo-guayacan-001",
+      treePurchaseId: purchase.id,
+      eventDate: new Date("2026-06-01"),
+      description: "Primer control de crecimiento: buen follaje y humedad estable en el suelo.",
+      location: "Reserva La Esperanza, lote 4",
+      status: TreeStatus.GROWING
+    }
+  });
+
+  await prisma.treePhoto.upsert({
+    where: { id: "photo-demo-guayacan-001" },
+    update: {},
+    create: {
+      id: "photo-demo-guayacan-001",
+      treeTrackingId: tracking.id,
+      imageUrl: "https://images.unsplash.com/photo-1523712999610-f77fbcfc3843?auto=format&fit=crop&w=1200&q=80",
+      caption: "Seguimiento inicial del Guayacan amarillo",
+      uploadedById: admin.id
+    }
+  });
+
+  await prisma.carbonFootprint.upsert({
+    where: { treePurchaseId: purchase.id },
+    update: {
+      estimatedKgCo2: products[0].estimatedKgCo2PerYear,
+      accumulatedKgCo2: products[0].estimatedKgCo2PerYear
+    },
+    create: {
       userId: cliente.id,
-      treesCount: 1,
-      estimatedKgCo2: trees[0].estimatedCo2,
-      notes: "Estimacion inicial segun especie adquirida."
+      treePurchaseId: purchase.id,
+      estimatedKgCo2: products[0].estimatedKgCo2PerYear,
+      accumulatedKgCo2: products[0].estimatedKgCo2PerYear,
+      notes: "Huella inicial por arbol comprado."
     }
   });
 
-  console.log(`Seed listo para ${admin.email} y ${cliente.email}`);
+  await prisma.adminUploadLog.upsert({
+    where: { id: "upload-log-demo-001" },
+    update: {},
+    create: {
+      id: "upload-log-demo-001",
+      adminId: admin.id,
+      fileName: "guayacan-seguimiento-001.jpg",
+      fileUrl: "https://images.unsplash.com/photo-1523712999610-f77fbcfc3843?auto=format&fit=crop&w=1200&q=80",
+      entityType: "TreePhoto",
+      entityId: "photo-demo-guayacan-001",
+      notes: "Carga inicial de prueba para seguimiento del arbol."
+    }
+  });
+
+  console.log(`Seed listo: ${admin.email}, ${cliente.email}, ${products.length} productos y 1 compra con QR.`);
 }
 
 main()

@@ -1,5 +1,6 @@
 const express = require("express");
 const prisma = require("../lib/prisma");
+const { mapTreePurchase } = require("../lib/mappers");
 const { requireAuth } = require("../middleware/auth");
 
 const router = express.Router();
@@ -16,7 +17,7 @@ router.post("/", requireAuth, async (request, response, next) => {
       treeId: item.treeId,
       quantity: Math.max(Number(item.quantity) || 1, 1)
     }));
-    const trees = await prisma.tree.findMany({
+    const trees = await prisma.treeProduct.findMany({
       where: { id: { in: requestedItems.map((item) => item.treeId) }, isActive: true }
     });
 
@@ -36,47 +37,51 @@ router.post("/", requireAuth, async (request, response, next) => {
       return sum + Number(tree.price) * item.quantity;
     }, 0);
 
-    const order = await prisma.$transaction(async (transaction) => {
-      const createdOrder = await transaction.order.create({
-        data: {
-          userId: request.user.id,
-          total,
-          items: {
-            create: requestedItems.map((item) => {
-              const tree = trees.find((candidate) => candidate.id === item.treeId);
-              return {
-                treeId: item.treeId,
-                quantity: item.quantity,
-                unitPrice: tree.price
-              };
-            })
-          }
-        },
-        include: { items: { include: { tree: true } } }
-      });
-
+    const purchases = await prisma.$transaction(async (transaction) => {
+      const createdPurchases = [];
       for (const item of requestedItems) {
         const tree = trees.find((candidate) => candidate.id === item.treeId);
-        await transaction.tree.update({
+        await transaction.treeProduct.update({
           where: { id: item.treeId },
           data: { stock: tree.stock - item.quantity }
         });
 
         for (let index = 0; index < item.quantity; index += 1) {
-          await transaction.userTree.create({
+          const purchase = await transaction.treePurchase.create({
             data: {
               userId: request.user.id,
-              treeId: item.treeId,
-              location: "Pendiente de asignacion por TerraBioCol"
-            }
+              treeProductId: item.treeId,
+              quantity: 1,
+              unitPrice: tree.price,
+              total: tree.price,
+              location: "Pendiente de asignacion por TerraBioCol",
+              payment: {
+                create: {
+                  reference: `PAY-${Date.now()}-${index}-${Math.random().toString(36).slice(2, 8)}`,
+                  amount: tree.price,
+                  status: "APPROVED",
+                  paidAt: new Date()
+                }
+              },
+              qrCode: {
+                create: {
+                  code: `TBC-${Date.now()}-${index}-${Math.random().toString(36).slice(2, 10)}`
+                }
+              }
+            },
+            include: { treeProduct: true, payment: true, qrCode: true, trackingEvents: true }
           });
+          createdPurchases.push(purchase);
         }
       }
 
-      return createdOrder;
+      return createdPurchases;
     });
 
-    response.status(201).json({ order });
+    response.status(201).json({
+      order: { total, purchases: purchases.map(mapTreePurchase) },
+      purchases: purchases.map(mapTreePurchase)
+    });
   } catch (error) {
     next(error);
   }

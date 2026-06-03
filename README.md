@@ -11,6 +11,20 @@ Aplicacion web full stack para venta, asignacion y seguimiento de arboles en Col
 - Autenticacion: JWT
 - Roles: `CLIENTE` y `ADMIN`
 
+## Modelo de datos
+
+El esquema Prisma define las entidades principales de TerraBioCol:
+
+- `User` y `Role` para usuarios y roles de acceso.
+- `TreeProduct` para catalogo de arboles disponibles.
+- `TreePurchase` para cada arbol comprado por un usuario.
+- `Payment` con estados `PENDING`, `APPROVED`, `REJECTED` y `CANCELLED`.
+- `QRCode` unico por arbol comprado.
+- `TreeTracking` para seguimientos con fecha, descripcion, ubicacion opcional y estado.
+- `TreePhoto` para fotos cargadas por administradores.
+- `CarbonFootprint` para calculos por arbol y acumulados por usuario.
+- `AdminUploadLog` para auditar cargas administrativas.
+
 ## Requisitos
 
 - Node.js 20 o superior con npm

@@ -1,16 +1,17 @@
 const express = require("express");
 const prisma = require("../lib/prisma");
+const { mapTreeProduct } = require("../lib/mappers");
 
 const router = express.Router();
 
 router.get("/", async (_request, response, next) => {
   try {
-    const trees = await prisma.tree.findMany({
+    const trees = await prisma.treeProduct.findMany({
       where: { isActive: true },
       orderBy: { createdAt: "desc" }
     });
 
-    response.json({ trees });
+    response.json({ trees: trees.map(mapTreeProduct) });
   } catch (error) {
     next(error);
   }
