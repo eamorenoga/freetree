@@ -13,7 +13,7 @@ const treeRoutes = require("./routes/trees");
 
 const app = express();
 const port = process.env.PORT || 4000;
-const clientDistPath = path.join(__dirname, "..", "..", "..", "client", "dist");
+const clientDistPath = path.join(__dirname, "..", "..", "client", "dist");
 
 app.use(
   cors({
