@@ -1,5 +1,6 @@
 const cors = require("cors");
 const express = require("express");
+const path = require("path");
 require("dotenv").config({ path: "../.env" });
 
 const adminRoutes = require("./routes/admin");
@@ -12,6 +13,7 @@ const treeRoutes = require("./routes/trees");
 
 const app = express();
 const port = process.env.PORT || 4000;
+const clientDistPath = path.join(__dirname, "..", "..", "..", "client", "dist");
 
 app.use(
   cors({
@@ -32,6 +34,17 @@ app.use("/api/my-trees", myTreesRoutes);
 app.use("/api/tracking", trackingRoutes);
 app.use("/api/carbon", carbonRoutes);
 app.use("/api/admin", adminRoutes);
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(clientDistPath));
+  app.use((request, response, next) => {
+    if (request.path.startsWith("/api")) {
+      return next();
+    }
+
+    response.sendFile(path.join(clientDistPath, "index.html"));
+  });
+}
 
 app.use((error, _request, response, _next) => {
   console.error(error);

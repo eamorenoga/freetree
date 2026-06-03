@@ -31,6 +31,22 @@ Frontend: http://localhost:5173
 
 Backend: http://localhost:4000
 
+## Despliegue en Render
+
+El proyecto incluye `render.yaml` para desplegar una sola Web Service Node que sirve la API y el frontend compilado.
+
+1. Haz push del repositorio a GitHub.
+2. En Render, crea un Blueprint desde este repo.
+3. Render creara:
+   - Web Service: `terrabiocol`
+   - PostgreSQL: `terrabiocol-db`
+4. El build ejecuta `npm install && npm run build`.
+5. El pre-deploy ejecuta migraciones y seed:
+   `npm run db:migrate:deploy && npm run db:seed`
+6. La app quedara disponible en la URL del Web Service.
+
+Si cambias el subdominio del servicio en Render, actualiza `CLIENT_URL` en el dashboard o en `render.yaml`.
+
 ## Usuarios demo
 
 - Admin: `admin@terrabiocol.com`
