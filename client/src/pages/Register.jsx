@@ -5,14 +5,14 @@ import { useAuth } from "../context/AuthContext";
 export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({ name: "", username: "", email: "", password: "" });
   const [error, setError] = useState("");
 
   async function handleSubmit(event) {
     event.preventDefault();
     setError("");
     try {
-      await register(form.name, form.email, form.password);
+      await register(form.name, form.username, form.email, form.password);
       navigate("/");
     } catch (requestError) {
       setError(requestError.message);
@@ -27,6 +27,8 @@ export default function Register() {
         {error ? <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
         <label className="mt-6 block text-sm font-semibold text-stone-700">Nombre</label>
         <input className="field mt-2" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} />
+        <label className="mt-4 block text-sm font-semibold text-stone-700">Usuario</label>
+        <input className="field mt-2" value={form.username} onChange={(event) => setForm({ ...form, username: event.target.value })} />
         <label className="mt-4 block text-sm font-semibold text-stone-700">Email</label>
         <input className="field mt-2" type="email" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} />
         <label className="mt-4 block text-sm font-semibold text-stone-700">Contrasena</label>

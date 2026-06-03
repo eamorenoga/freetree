@@ -1,7 +1,7 @@
 const cors = require("cors");
 const express = require("express");
 const path = require("path");
-require("dotenv").config({ path: "../.env" });
+const { requireEnvironment } = require("./config/env");
 
 const adminRoutes = require("./routes/admin");
 const authRoutes = require("./routes/auth");
@@ -10,6 +10,8 @@ const myTreesRoutes = require("./routes/myTrees");
 const orderRoutes = require("./routes/orders");
 const trackingRoutes = require("./routes/tracking");
 const treeRoutes = require("./routes/trees");
+
+requireEnvironment();
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -34,6 +36,10 @@ app.use("/api/my-trees", myTreesRoutes);
 app.use("/api/tracking", trackingRoutes);
 app.use("/api/carbon", carbonRoutes);
 app.use("/api/admin", adminRoutes);
+
+app.use("/api", (_request, response) => {
+  response.status(404).json({ message: "Endpoint no encontrado" });
+});
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(clientDistPath));

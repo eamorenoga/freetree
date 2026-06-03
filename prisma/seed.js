@@ -1,4 +1,5 @@
 const bcrypt = require("bcryptjs");
+require("../server/src/config/env").requireEnvironment();
 const { PrismaClient, PaymentStatus, TreeStatus, UserRole } = require("@prisma/client");
 
 const prisma = new PrismaClient();
@@ -37,9 +38,10 @@ async function main() {
 
   const admin = await prisma.user.upsert({
     where: { email: "admin@terrabiocol.com" },
-    update: { passwordHash, role: UserRole.ADMIN },
+    update: { username: "admin", passwordHash, role: UserRole.ADMIN },
     create: {
       name: "Administracion TerraBioCol",
+      username: "admin",
       email: "admin@terrabiocol.com",
       passwordHash,
       role: UserRole.ADMIN
@@ -48,9 +50,10 @@ async function main() {
 
   const cliente = await prisma.user.upsert({
     where: { email: "cliente@terrabiocol.com" },
-    update: { passwordHash, role: UserRole.CLIENTE },
+    update: { username: "cliente", passwordHash, role: UserRole.CLIENTE },
     create: {
       name: "Cliente Demo",
+      username: "cliente",
       email: "cliente@terrabiocol.com",
       passwordHash,
       role: UserRole.CLIENTE

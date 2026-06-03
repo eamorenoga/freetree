@@ -5,14 +5,14 @@ import { useAuth } from "../context/AuthContext";
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: "cliente@terrabiocol.com", password: "Terrabio123!" });
+  const [form, setForm] = useState({ identifier: "cliente", password: "Terrabio123!" });
   const [error, setError] = useState("");
 
   async function handleSubmit(event) {
     event.preventDefault();
     setError("");
     try {
-      await login(form.email, form.password);
+      await login(form.identifier, form.password);
       navigate("/");
     } catch (requestError) {
       setError(requestError.message);
@@ -26,8 +26,8 @@ export default function Login() {
         <h1 className="mt-2 text-3xl font-bold text-forest">Iniciar sesion</h1>
         <p className="mt-2 text-sm text-stone-500">Gestiona tus arboles, compras y compensacion ambiental.</p>
         {error ? <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
-        <label className="mt-6 block text-sm font-semibold text-stone-700">Email</label>
-        <input className="field mt-2" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} />
+        <label className="mt-6 block text-sm font-semibold text-stone-700">Usuario o correo</label>
+        <input className="field mt-2" value={form.identifier} onChange={(event) => setForm({ ...form, identifier: event.target.value })} />
         <label className="mt-4 block text-sm font-semibold text-stone-700">Contrasena</label>
         <input
           className="field mt-2"
@@ -40,6 +40,9 @@ export default function Login() {
         </button>
         <p className="mt-4 text-center text-sm text-stone-500">
           No tienes cuenta? <Link className="font-semibold text-leaf" to="/register">Registrate</Link>
+        </p>
+        <p className="mt-2 text-center text-sm text-stone-500">
+          Olvidaste tu contrasena? <Link className="font-semibold text-leaf" to="/forgot-password">Recuperala</Link>
         </p>
       </form>
     </main>

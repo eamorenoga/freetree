@@ -13,7 +13,7 @@ async function requireAuth(request, response, next) {
     const payload = jwt.verify(token, process.env.JWT_SECRET || "development-secret");
     const user = await prisma.user.findUnique({
       where: { id: payload.id },
-      select: { id: true, name: true, email: true, role: true, createdAt: true }
+      select: { id: true, name: true, username: true, email: true, role: true, createdAt: true }
     });
 
     if (!user) {
@@ -29,7 +29,9 @@ async function requireAuth(request, response, next) {
 
 function requireRole(role) {
   return (request, response, next) => {
-    if (request.user?.role !== role) {
+    const allowedRoles = Array.isArray(role) ? role : [role];
+
+    if (!allowedRoles.includes(request.user?.role)) {
       return response.status(403).json({ message: "No tienes permisos para esta accion" });
     }
 

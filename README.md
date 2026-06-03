@@ -63,9 +63,22 @@ Si cambias el subdominio del servicio en Render, actualiza `CLIENT_URL` en el da
 
 ## Usuarios demo
 
-- Admin: `admin@terrabiocol.com`
-- Cliente: `cliente@terrabiocol.com`
+- Admin: `admin` o `admin@terrabiocol.com`
+- Cliente: `cliente` o `cliente@terrabiocol.com`
 - Contrasena para ambos: `Terrabio123!`
+
+## Autenticacion
+
+Endpoints REST principales:
+
+- `POST /api/auth/register`: crea usuario `CLIENTE` con nombre, usuario, correo y contrasena cifrada con bcrypt.
+- `POST /api/auth/login`: inicia sesion con usuario/correo y contrasena.
+- `GET /api/auth/me`: devuelve el usuario autenticado usando JWT.
+- `PUT /api/auth/profile`: actualiza nombre y usuario.
+- `POST /api/auth/forgot-password`: genera token de recuperacion simulado.
+- `POST /api/auth/reset-password`: restablece contrasena con token.
+
+El middleware `requireAuth` valida JWT y `requireRole("ADMIN")` protege rutas administrativas.
 
 ## Scripts
 
@@ -79,6 +92,10 @@ Si cambias el subdominio del servicio en Render, actualiza `CLIENT_URL` en el da
 ## Variables de entorno
 
 Copia `.env.example` a `.env` y ajusta valores segun tu entorno.
+
+Si ves `Environment variable not found: DATABASE_URL`, significa que Prisma no encontro la cadena de conexion.
+En local, confirma que existe `.env` en la raiz con `DATABASE_URL`.
+En Render, confirma que el servicio tenga `DATABASE_URL` apuntando a la base PostgreSQL.
 
 ## Flujo de uso
 

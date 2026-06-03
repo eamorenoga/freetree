@@ -7,11 +7,13 @@ import { AuthProvider } from "./context/AuthContext";
 import Admin from "./pages/Admin";
 import BuyTree from "./pages/BuyTree";
 import CarbonFootprint from "./pages/CarbonFootprint";
+import ForgotPassword from "./pages/ForgotPassword";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import MyTrees from "./pages/MyTrees";
 import Profile from "./pages/Profile";
 import Register from "./pages/Register";
+import ResetPassword from "./pages/ResetPassword";
 import Tracking from "./pages/Tracking";
 import "./styles.css";
 
@@ -22,6 +24,8 @@ createRoot(document.getElementById("root")).render(
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route
             path="/"
             element={
