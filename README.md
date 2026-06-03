@@ -108,6 +108,13 @@ Para configurarlo manualmente en Render:
    - Value: el `Internal Database URL` de PostgreSQL
 6. Guarda y ejecuta `Manual Deploy > Clear build cache & deploy`.
 
+Si ves `The table public.User does not exist`, la base existe pero esta sin migraciones.
+Ejecuta un nuevo deploy; el comando de inicio corre automaticamente:
+
+```bash
+npm run db:migrate:deploy && npm run db:seed
+```
+
 ## Flujo de uso
 
 1. Registrate o inicia sesion.
