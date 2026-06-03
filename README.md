@@ -97,6 +97,17 @@ Si ves `Environment variable not found: DATABASE_URL`, significa que Prisma no e
 En local, confirma que existe `.env` en la raiz con `DATABASE_URL`.
 En Render, confirma que el servicio tenga `DATABASE_URL` apuntando a la base PostgreSQL.
 
+Para configurarlo manualmente en Render:
+
+1. Abre tu base PostgreSQL en Render.
+2. Copia el valor de `Internal Database URL`.
+3. Abre el Web Service de TerraBioCol.
+4. Ve a `Environment`.
+5. Agrega:
+   - Key: `DATABASE_URL`
+   - Value: el `Internal Database URL` de PostgreSQL
+6. Guarda y ejecuta `Manual Deploy > Clear build cache & deploy`.
+
 ## Flujo de uso
 
 1. Registrate o inicia sesion.
