@@ -34,7 +34,9 @@ export default function PublicTree() {
       <section className="mx-auto max-w-5xl">
         <div className="grid gap-6 lg:grid-cols-[1fr_18rem]">
           <article className="card overflow-hidden">
-            {tree?.imageUrl ? <img className="h-72 w-full object-cover" src={tree.imageUrl} alt={tree.species} /> : null}
+            {tree?.currentImageUrl || tree?.imageUrl ? (
+              <img className="h-72 w-full object-cover" src={tree.currentImageUrl || tree.imageUrl} alt={tree.species} />
+            ) : null}
             <div className="p-6">
               <p className="text-sm font-semibold text-moss">TerraBioCol QR {data.qr.code}</p>
               <h1 className="mt-1 text-3xl font-bold text-forest">{tree?.name || tree?.species || "Arbol registrado"}</h1>

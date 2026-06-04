@@ -33,7 +33,7 @@ export default function MyTrees() {
       <div className="grid gap-4">
         {data.userTrees.map((item) => (
           <article className="card grid gap-5 p-5 lg:grid-cols-[200px_1fr_180px]" key={item.id}>
-            <img className="h-44 w-full rounded-lg object-cover" src={item.tree.imageUrl} alt={item.tree.species} />
+            <img className="h-44 w-full rounded-lg object-cover" src={item.currentImageUrl || item.tree.currentImageUrl || item.tree.imageUrl} alt={item.tree.species} />
             <div className="min-w-0">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>

@@ -42,6 +42,8 @@ router.get("/public/:qrCode", async (request, response, next) => {
 
     const purchase = qrCode.treePurchase;
     const tree = purchase?.treeProduct || qrCode.treeProduct;
+    const timeline = purchase?.trackingEvents ? purchase.trackingEvents.map(mapTreeTracking) : [];
+    const currentImageUrl = timeline.find((event) => event.photos?.length)?.photos?.[0]?.imageUrl || tree?.imageUrl;
 
     const publicQr = mapQrCode(qrCode);
 
@@ -52,7 +54,7 @@ router.get("/public/:qrCode", async (request, response, next) => {
         publicUrl: publicQr.publicUrl,
         assigned: Boolean(purchase)
       },
-      tree: tree ? mapTreeProduct(tree) : null,
+      tree: tree ? { ...mapTreeProduct(tree), currentImageUrl } : null,
       owner: mapPublicOwner(purchase?.user),
       ownerLabel: purchase?.user ? purchase.user.name : "No asignado",
       purchase: purchase
@@ -75,7 +77,7 @@ router.get("/public/:qrCode", async (request, response, next) => {
             accumulatedKgCo2: 0,
             calculationDate: null
           },
-      timeline: purchase?.trackingEvents ? purchase.trackingEvents.map(mapTreeTracking) : []
+      timeline
     });
   } catch (error) {
     next(error);

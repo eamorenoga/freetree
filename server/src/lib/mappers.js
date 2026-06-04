@@ -21,7 +21,22 @@ function mapTreeProduct(product) {
   };
 }
 
+function getLatestTrackingPhotoUrl(trackingEvents = []) {
+  const eventsByNewestPhoto = [...trackingEvents].sort((firstEvent, secondEvent) => {
+    const firstPhotoDate = firstEvent.photos?.[0]?.createdAt || firstEvent.eventDate;
+    const secondPhotoDate = secondEvent.photos?.[0]?.createdAt || secondEvent.eventDate;
+
+    return new Date(secondPhotoDate).getTime() - new Date(firstPhotoDate).getTime();
+  });
+  const latestPhoto = eventsByNewestPhoto.find((event) => event.photos?.length)?.photos?.[0];
+
+  return latestPhoto ? getPhotoUrl(latestPhoto) : null;
+}
+
 function mapTreePurchase(purchase) {
+  const currentImageUrl = getLatestTrackingPhotoUrl(purchase.trackingEvents) || purchase.treeProduct?.imageUrl;
+  const mappedTree = purchase.treeProduct ? { ...mapTreeProduct(purchase.treeProduct), currentImageUrl } : undefined;
+
   return {
     id: purchase.id,
     userId: purchase.userId,
@@ -34,8 +49,9 @@ function mapTreePurchase(purchase) {
     plantedAt: purchase.plantedAt,
     location: purchase.location || "Pendiente de asignacion por TerraBioCol",
     createdAt: purchase.createdAt,
-    tree: purchase.treeProduct ? mapTreeProduct(purchase.treeProduct) : undefined,
-    treeProduct: purchase.treeProduct ? mapTreeProduct(purchase.treeProduct) : undefined,
+    currentImageUrl,
+    tree: mappedTree,
+    treeProduct: mappedTree,
     trackingEvents: purchase.trackingEvents ? purchase.trackingEvents.map(mapTreeTracking) : [],
     qrCode: mapQrCode(purchase.qrCode),
     carbonFootprint: purchase.carbonFootprint,
