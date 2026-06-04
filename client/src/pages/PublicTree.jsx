@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { apiRequest } from "../lib/api";
+import { apiRequest, resolveMediaUrl } from "../lib/api";
 
 export default function PublicTree() {
   const { qrCode } = useParams();
@@ -35,7 +35,7 @@ export default function PublicTree() {
         <div className="grid gap-6 lg:grid-cols-[1fr_18rem]">
           <article className="card overflow-hidden">
             {tree?.currentImageUrl || tree?.imageUrl ? (
-              <img className="h-72 w-full object-cover" src={tree.currentImageUrl || tree.imageUrl} alt={tree.species} />
+              <img className="h-72 w-full object-cover" src={resolveMediaUrl(tree.currentImageUrl || tree.imageUrl)} alt={tree.species} />
             ) : null}
             <div className="p-6">
               <p className="text-sm font-semibold text-moss">TerraBioCol QR {data.qr.code}</p>
@@ -92,7 +92,7 @@ export default function PublicTree() {
                   <div className="mt-4 grid gap-3 sm:grid-cols-2">
                     {event.photos.map((photo) => (
                       <figure key={photo.id}>
-                        <img className="h-48 w-full rounded-lg object-cover" src={photo.imageUrl} alt={photo.caption || event.title} />
+                        <img className="h-48 w-full rounded-lg object-cover" src={resolveMediaUrl(photo.imageUrl)} alt={photo.caption || event.title} />
                         {photo.caption ? <figcaption className="mt-2 text-xs text-stone-500">{photo.caption}</figcaption> : null}
                       </figure>
                     ))}

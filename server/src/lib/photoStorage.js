@@ -15,8 +15,8 @@ function parsePhotoData(photoData) {
 
 function getPhotoUrl(photo) {
   if (photo?.imageData) {
-    const apiBaseUrl = process.env.PUBLIC_API_URL || process.env.VITE_API_URL || `http://localhost:${process.env.PORT || 4000}/api`;
-    return `${apiBaseUrl.replace(/\/$/, "")}/photos/${photo.id}`;
+    const apiBaseUrl = process.env.PUBLIC_API_URL || process.env.VITE_API_URL;
+    return apiBaseUrl ? `${apiBaseUrl.replace(/\/$/, "")}/photos/${photo.id}` : `/api/photos/${photo.id}`;
   }
 
   return photo?.imageUrl || null;

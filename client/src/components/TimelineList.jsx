@@ -1,3 +1,5 @@
+import { resolveMediaUrl } from "../lib/api";
+
 export default function TimelineList({ events = [], emptyText = "Aun no hay eventos registrados." }) {
   if (!events.length) {
     return <p className="rounded-lg border border-dashed border-stone-300 bg-stone-50 p-4 text-sm text-stone-500">{emptyText}</p>;
@@ -21,7 +23,7 @@ export default function TimelineList({ events = [], emptyText = "Aun no hay even
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {event.photos.map((photo) => (
                 <figure key={photo.id}>
-                  <img className="h-40 w-full rounded-lg object-cover" src={photo.imageUrl} alt={photo.caption || event.title} />
+                  <img className="h-40 w-full rounded-lg object-cover" src={resolveMediaUrl(photo.imageUrl)} alt={photo.caption || event.title} />
                   {photo.caption ? <figcaption className="mt-1 text-xs text-stone-500">{photo.caption}</figcaption> : null}
                 </figure>
               ))}
