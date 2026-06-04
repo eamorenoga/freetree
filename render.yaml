@@ -17,6 +17,10 @@ services:
         generateValue: true
       - key: CLIENT_URL
         value: https://terrabiocol.onrender.com
+      - key: PUBLIC_APP_URL
+        value: https://terrabiocol.onrender.com
+      - key: PUBLIC_API_URL
+        value: https://terrabiocol.onrender.com/api
 
 databases:
   - name: terrabiocol-db

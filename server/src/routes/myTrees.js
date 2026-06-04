@@ -13,6 +13,7 @@ router.get("/", requireAuth, async (request, response, next) => {
         treeProduct: true,
         payment: true,
         qrCode: true,
+        carbonFootprint: true,
         trackingEvents: { include: { photos: true }, orderBy: { eventDate: "desc" } }
       },
       orderBy: { createdAt: "desc" }

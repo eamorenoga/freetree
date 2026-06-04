@@ -1,6 +1,6 @@
 const express = require("express");
 const prisma = require("../lib/prisma");
-const { getPublicTreeUrl } = require("../lib/qr");
+const { mapQrCode } = require("../lib/qr");
 const { mapTreeProduct, mapTreeTracking } = require("../lib/mappers");
 
 const router = express.Router();
@@ -43,11 +43,13 @@ router.get("/public/:qrCode", async (request, response, next) => {
     const purchase = qrCode.treePurchase;
     const tree = purchase?.treeProduct || qrCode.treeProduct;
 
+    const publicQr = mapQrCode(qrCode);
+
     response.json({
       qr: {
-        code: qrCode.code,
-        imageUrl: qrCode.imageUrl,
-        publicUrl: getPublicTreeUrl(qrCode.code),
+        code: publicQr.code,
+        imageUrl: publicQr.imageUrl,
+        publicUrl: publicQr.publicUrl,
         assigned: Boolean(purchase)
       },
       tree: tree ? mapTreeProduct(tree) : null,

@@ -122,7 +122,10 @@ model TreeTracking {
 model TreePhoto {
   id             String        @id @default(cuid())
   treeTrackingId String
-  imageUrl       String
+  imageUrl       String?
+  imageData      Bytes?
+  mimeType       String?
+  fileName       String?
   caption        String?
   uploadedById   String?
   createdAt      DateTime      @default(now())

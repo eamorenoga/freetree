@@ -14,13 +14,33 @@ const emptyTree = {
   stock: ""
 };
 
+const emptyProgress = {
+  title: "",
+  description: "",
+  imageUrl: "",
+  photoData: "",
+  photoMimeType: "",
+  fileName: "",
+  location: "",
+  status: "GROWING"
+};
+
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
 export default function Admin() {
   const dashboard = useApiResource("/admin/dashboard", { stats: {}, recentOrders: [] });
   const trees = useApiResource("/admin/trees", { trees: [] });
   const [form, setForm] = useState(emptyTree);
   const [qrSearch, setQrSearch] = useState("");
   const [qrResult, setQrResult] = useState(null);
-  const [progressForm, setProgressForm] = useState({ title: "", description: "", imageUrl: "", location: "", status: "GROWING" });
+  const [progressForm, setProgressForm] = useState(emptyProgress);
   const [scannerActive, setScannerActive] = useState(false);
   const [message, setMessage] = useState("");
   const videoRef = useRef(null);
@@ -82,7 +102,7 @@ export default function Admin() {
         method: "POST",
         body: JSON.stringify(progressForm)
       });
-      setProgressForm({ title: "", description: "", imageUrl: "", location: "", status: "GROWING" });
+      setProgressForm(emptyProgress);
       setMessage("Progreso registrado.");
       const refreshedQr = await apiRequest(`/admin/qr/${encodeURIComponent(qrResult.code)}`);
       setQrResult(refreshedQr.qr);
@@ -137,6 +157,23 @@ export default function Admin() {
       setMessage("No fue posible abrir la camara. Ingresa el codigo QR manualmente.");
       stopScanner();
     }
+  }
+
+  async function handleProgressPhoto(event) {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      setProgressForm({ ...progressForm, photoData: "", photoMimeType: "", fileName: "" });
+      return;
+    }
+
+    const photoData = await readFileAsDataUrl(file);
+    setProgressForm({
+      ...progressForm,
+      photoData,
+      photoMimeType: file.type,
+      fileName: file.name
+    });
   }
 
   const stats = dashboard.data.stats;
@@ -257,7 +294,7 @@ export default function Admin() {
                 <input
                   className="field"
                   disabled={!qrResult.treePurchase}
-                  placeholder="URL de foto"
+                  placeholder="URL de foto opcional"
                   value={progressForm.imageUrl}
                   onChange={(event) => setProgressForm({ ...progressForm, imageUrl: event.target.value })}
                 />
@@ -275,6 +312,14 @@ export default function Admin() {
                   <option value="MATURE">Maduro</option>
                 </select>
               </div>
+              <input
+                accept="image/*"
+                className="field"
+                disabled={!qrResult.treePurchase}
+                onChange={handleProgressPhoto}
+                type="file"
+              />
+              {progressForm.fileName ? <p className="text-sm font-semibold text-moss">Foto lista para guardar en base de datos: {progressForm.fileName}</p> : null}
               <textarea
                 className="field min-h-24"
                 disabled={!qrResult.treePurchase}

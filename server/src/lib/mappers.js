@@ -1,4 +1,5 @@
-const { getPublicTreeUrl } = require("./qr");
+const { mapQrCode } = require("./qr");
+const { getPhotoUrl } = require("./photoStorage");
 
 function mapTreeProduct(product) {
   return {
@@ -35,7 +36,7 @@ function mapTreePurchase(purchase) {
     tree: purchase.treeProduct ? mapTreeProduct(purchase.treeProduct) : undefined,
     treeProduct: purchase.treeProduct ? mapTreeProduct(purchase.treeProduct) : undefined,
     trackingEvents: purchase.trackingEvents ? purchase.trackingEvents.map(mapTreeTracking) : [],
-    qrCode: purchase.qrCode ? { ...purchase.qrCode, publicUrl: getPublicTreeUrl(purchase.qrCode.code) } : purchase.qrCode,
+    qrCode: mapQrCode(purchase.qrCode),
     carbonFootprint: purchase.carbonFootprint,
     payment: purchase.payment
   };
@@ -48,13 +49,26 @@ function mapTreeTracking(event) {
     treePurchaseId: event.treePurchaseId,
     title: event.status,
     description: event.description,
-    imageUrl: event.photos?.[0]?.imageUrl,
+    imageUrl: event.photos?.[0] ? getPhotoUrl(event.photos[0]) : undefined,
     eventDate: event.eventDate,
     location: event.location,
     status: event.status,
-    photos: event.photos || [],
+    photos: event.photos ? event.photos.map(mapTreePhoto) : [],
     userTree: event.treePurchase ? mapTreePurchase(event.treePurchase) : undefined,
     treePurchase: event.treePurchase ? mapTreePurchase(event.treePurchase) : undefined
+  };
+}
+
+function mapTreePhoto(photo) {
+  return {
+    id: photo.id,
+    treeTrackingId: photo.treeTrackingId,
+    imageUrl: getPhotoUrl(photo),
+    caption: photo.caption,
+    uploadedById: photo.uploadedById,
+    fileName: photo.fileName,
+    mimeType: photo.mimeType,
+    createdAt: photo.createdAt
   };
 }
 
@@ -74,6 +88,7 @@ function mapCarbonFootprint(record) {
 
 module.exports = {
   mapCarbonFootprint,
+  mapTreePhoto,
   mapTreeProduct,
   mapTreePurchase,
   mapTreeTracking

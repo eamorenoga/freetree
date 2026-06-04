@@ -1,0 +1,5 @@
+ALTER TABLE "TreePhoto"
+ALTER COLUMN "imageUrl" DROP NOT NULL,
+ADD COLUMN "imageData" BYTEA,
+ADD COLUMN "mimeType" TEXT,
+ADD COLUMN "fileName" TEXT;

@@ -1,6 +1,8 @@
 const express = require("express");
 const prisma = require("../lib/prisma");
-const { createQrCode, getPublicTreeUrl, getQrImageUrl } = require("../lib/qr");
+const { mapTreeTracking } = require("../lib/mappers");
+const { parsePhotoData } = require("../lib/photoStorage");
+const { createQrCode, getQrImageUrl, mapQrCode } = require("../lib/qr");
 const { requireAuth, requireRole } = require("../middleware/auth");
 
 const router = express.Router();
@@ -124,6 +126,20 @@ router.delete("/trees/:id", async (request, response, next) => {
   }
 });
 
+function mapAdminQr(qrCode) {
+  const treePurchase = qrCode.treePurchase
+    ? {
+        ...qrCode.treePurchase,
+        trackingEvents: qrCode.treePurchase.trackingEvents?.map(mapTreeTracking) || []
+      }
+    : null;
+
+  return {
+    ...mapQrCode(qrCode),
+    treePurchase,
+  };
+}
+
 router.post("/trees/:id/qr", async (request, response, next) => {
   try {
     const tree = await prisma.treeProduct.findUnique({ where: { id: request.params.id } });
@@ -143,10 +159,7 @@ router.post("/trees/:id/qr", async (request, response, next) => {
     });
 
     response.status(201).json({
-      qr: {
-        ...qrCode,
-        publicUrl: getPublicTreeUrl(qrCode.code)
-      }
+      qr: mapAdminQr(qrCode)
     });
   } catch (error) {
     next(error);
@@ -175,19 +188,44 @@ router.get("/qr/:qrCode", async (request, response, next) => {
     }
 
     response.json({
-      qr: {
-        ...qrCode,
-        publicUrl: getPublicTreeUrl(qrCode.code)
-      }
+      qr: mapAdminQr(qrCode)
     });
   } catch (error) {
     next(error);
   }
 });
 
+function buildPhotoCreateData({ imageUrl, photoData, photoMimeType, fileName, caption, title, userId }) {
+  const parsedPhoto = parsePhotoData(photoData);
+
+  if (!imageUrl && !parsedPhoto) {
+    return undefined;
+  }
+
+  return {
+    imageUrl: imageUrl || undefined,
+    imageData: parsedPhoto?.buffer,
+    mimeType: photoMimeType || parsedPhoto?.mimeType,
+    fileName,
+    caption: caption || title,
+    uploadedById: userId
+  };
+}
+
 router.post("/qr/:qrCode/progress", async (request, response, next) => {
   try {
-    const { title, description, imageUrl, caption, location, status = "GROWING", fileName, notes } = request.body;
+    const {
+      title,
+      description,
+      imageUrl,
+      photoData,
+      photoMimeType,
+      caption,
+      location,
+      status = "GROWING",
+      fileName,
+      notes
+    } = request.body;
 
     if (!title || !description) {
       return response.status(400).json({ message: "Titulo y descripcion son requeridos" });
@@ -206,24 +244,34 @@ router.post("/qr/:qrCode/progress", async (request, response, next) => {
       return response.status(400).json({ message: "Este QR aun no esta asignado a una compra" });
     }
 
+    const photoCreateData = buildPhotoCreateData({
+      imageUrl,
+      photoData,
+      photoMimeType,
+      fileName,
+      caption,
+      title,
+      userId: request.user.id
+    });
+
     const trackingEvent = await prisma.treeTracking.create({
       data: {
         treePurchaseId: qrCode.treePurchase.id,
         description: `${title}: ${description}`,
         location,
         status,
-        photos: imageUrl ? { create: { imageUrl, caption: caption || title, uploadedById: request.user.id } } : undefined
+        photos: photoCreateData ? { create: photoCreateData } : undefined
       },
       include: { photos: true, treePurchase: { include: { treeProduct: true, payment: true, qrCode: true } } }
     });
 
     let uploadLog = null;
-    if (imageUrl) {
+    if (imageUrl || photoData) {
       uploadLog = await prisma.adminUploadLog.create({
         data: {
           adminId: request.user.id,
-          fileName: fileName || imageUrl.split("/").pop() || "tree-progress-photo",
-          fileUrl: imageUrl,
+          fileName: fileName || imageUrl?.split("/").pop() || "tree-progress-photo",
+          fileUrl: imageUrl || `/api/photos/${trackingEvent.photos[0]?.id}`,
           entityType: "TreeTracking",
           entityId: trackingEvent.id,
           notes
@@ -231,7 +279,7 @@ router.post("/qr/:qrCode/progress", async (request, response, next) => {
       });
     }
 
-    response.status(201).json({ event: trackingEvent, uploadLog });
+    response.status(201).json({ event: mapTreeTracking(trackingEvent), uploadLog });
   } catch (error) {
     next(error);
   }
@@ -239,29 +287,33 @@ router.post("/qr/:qrCode/progress", async (request, response, next) => {
 
 router.post("/tracking/:id/photos", async (request, response, next) => {
   try {
-    const { imageUrl, caption, fileName, notes } = request.body;
+    const { imageUrl, photoData, photoMimeType, caption, fileName, notes } = request.body;
+    const parsedPhoto = parsePhotoData(photoData);
 
-    if (!imageUrl) {
-      return response.status(400).json({ message: "La URL de la foto es requerida" });
+    if (!imageUrl && !parsedPhoto) {
+      return response.status(400).json({ message: "La foto es requerida" });
     }
 
     const photo = await prisma.treePhoto.create({
       data: {
         treeTrackingId: request.params.id,
-        imageUrl,
+        imageUrl: imageUrl || undefined,
+        imageData: parsedPhoto?.buffer,
+        mimeType: photoMimeType || parsedPhoto?.mimeType,
+        fileName,
         caption,
         uploadedById: request.user.id
       }
     });
 
     const uploadLog = await prisma.adminUploadLog.create({
-      data: {
-        adminId: request.user.id,
-        fileName: fileName || imageUrl.split("/").pop() || "tree-progress-photo",
-        fileUrl: imageUrl,
-        entityType: "TreePhoto",
-        entityId: photo.id,
-        notes
+        data: {
+          adminId: request.user.id,
+          fileName: fileName || imageUrl?.split("/").pop() || "tree-progress-photo",
+          fileUrl: imageUrl || `/api/photos/${photo.id}`,
+          entityType: "TreePhoto",
+          entityId: photo.id,
+          notes
       }
     });
 
