@@ -34,6 +34,14 @@ async function main() {
         name: UserRole.ADMIN,
         description: "Administrador con permisos para catalogo, fotos y seguimiento."
       }
+    }),
+    prisma.role.upsert({
+      where: { name: UserRole.OPERARIO },
+      update: { description: "Operario de campo con permisos para escanear QR y registrar seguimiento fotografico." },
+      create: {
+        name: UserRole.OPERARIO,
+        description: "Operario de campo con permisos para escanear QR y registrar seguimiento fotografico."
+      }
     })
   ]);
 
@@ -58,6 +66,18 @@ async function main() {
       email: "cliente@terrabiocol.com",
       passwordHash,
       role: UserRole.CLIENTE
+    }
+  });
+
+  await prisma.user.upsert({
+    where: { email: "operario@terrabiocol.com" },
+    update: { username: "operario", passwordHash, role: UserRole.OPERARIO },
+    create: {
+      name: "Operario Demo",
+      username: "operario",
+      email: "operario@terrabiocol.com",
+      passwordHash,
+      role: UserRole.OPERARIO
     }
   });
 

@@ -8,6 +8,7 @@ const authRoutes = require("./routes/auth");
 const carbonRoutes = require("./routes/carbon");
 const myTreesRoutes = require("./routes/myTrees");
 const orderRoutes = require("./routes/orders");
+const operatorRoutes = require("./routes/operator");
 const photoRoutes = require("./routes/photos");
 const publicTreeRoutes = require("./routes/publicTree");
 const trackingRoutes = require("./routes/tracking");
@@ -34,6 +35,7 @@ app.get("/api/health", (_request, response) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/trees", treeRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/operator", operatorRoutes);
 app.use("/api/photos", photoRoutes);
 app.use("/api/tree", publicTreeRoutes);
 app.use("/api/my-trees", myTreesRoutes);

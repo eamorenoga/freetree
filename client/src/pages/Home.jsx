@@ -12,6 +12,10 @@ export default function Home() {
     return <AdminHome />;
   }
 
+  if (user?.role === "OPERARIO") {
+    return <OperatorHome />;
+  }
+
   return (
     <section>
       <PageHeader
@@ -39,6 +43,24 @@ export default function Home() {
             alt="Bosque colombiano"
           />
         </div>
+      </div>
+    </section>
+  );
+}
+
+function OperatorHome() {
+  return (
+    <section>
+      <PageHeader
+        eyebrow="Dashboard operario"
+        title="Trabajo de campo"
+        description="Escanea QR, toma fotos desde el celular y actualiza la trazabilidad de los arboles."
+        action={<a className="btn-primary" href="/app/operario">Abrir escaner</a>}
+      />
+      <div className="grid gap-4 md:grid-cols-3">
+        <MetricCard label="Escaneo QR" value="Camara" detail="Lectura de codigos desde celular." />
+        <MetricCard label="Fotos" value="BLOB" detail="Evidencia guardada en base de datos." />
+        <MetricCard label="Trazabilidad" value="Activa" detail="Eventos visibles para el cliente." />
       </div>
     </section>
   );

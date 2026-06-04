@@ -3,10 +3,11 @@ import { useAuth } from "../context/AuthContext";
 
 const menuItems = [
   { to: "/app", label: "Inicio", shortLabel: "Inicio" },
-  { to: "/app/comprar-arbol", label: "Comprar arbol", shortLabel: "Comprar" },
-  { to: "/app/mis-arboles", label: "Mis arboles", shortLabel: "Arboles" },
-  { to: "/app/seguimiento", label: "Seguimiento", shortLabel: "Monitoreo" },
-  { to: "/app/huella-carbono", label: "Huella de carbono", shortLabel: "CO2" },
+  { to: "/app/comprar-arbol", label: "Comprar arbol", shortLabel: "Comprar", roles: ["CLIENTE", "ADMIN"] },
+  { to: "/app/mis-arboles", label: "Mis arboles", shortLabel: "Arboles", roles: ["CLIENTE", "ADMIN"] },
+  { to: "/app/seguimiento", label: "Seguimiento", shortLabel: "Monitoreo", roles: ["CLIENTE", "ADMIN"] },
+  { to: "/app/operario", label: "Operario campo", shortLabel: "Campo", operatorOnly: true },
+  { to: "/app/huella-carbono", label: "Huella de carbono", shortLabel: "CO2", roles: ["CLIENTE", "ADMIN"] },
   { to: "/app/perfil", label: "Perfil", shortLabel: "Perfil" },
   { to: "/app/admin", label: "Administracion", shortLabel: "Admin", adminOnly: true }
 ];
@@ -30,7 +31,12 @@ export default function AppLayout() {
         </div>
         <nav className="grid gap-2">
           {menuItems
-            .filter((item) => !item.adminOnly || user?.role === "ADMIN")
+            .filter(
+              (item) =>
+                (!item.roles || item.roles.includes(user?.role)) &&
+                (!item.adminOnly || user?.role === "ADMIN") &&
+                (!item.operatorOnly || ["ADMIN", "OPERARIO"].includes(user?.role))
+            )
             .map((item) => (
               <NavLink
                 key={item.to}
@@ -69,7 +75,13 @@ export default function AppLayout() {
       </div>
       <nav className="fixed inset-x-3 bottom-3 z-20 grid grid-cols-5 gap-1 rounded-lg border border-stone-200 bg-white/95 p-2 shadow-lg backdrop-blur lg:hidden">
         {menuItems
-          .filter((item) => (!item.adminOnly || user?.role === "ADMIN") && item.to !== "/app/perfil")
+          .filter(
+            (item) =>
+              (!item.adminOnly || user?.role === "ADMIN") &&
+              (!item.roles || item.roles.includes(user?.role)) &&
+              (!item.operatorOnly || ["ADMIN", "OPERARIO"].includes(user?.role)) &&
+              item.to !== "/app/perfil"
+          )
           .slice(0, 5)
           .map((item) => (
             <NavLink

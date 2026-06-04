@@ -12,6 +12,7 @@ import Home from "./pages/Home";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import MyTrees from "./pages/MyTrees";
+import Operator from "./pages/Operator";
 import Profile from "./pages/Profile";
 import PublicTree from "./pages/PublicTree";
 import Register from "./pages/Register";
@@ -42,6 +43,14 @@ createRoot(document.getElementById("root")).render(
             <Route path="comprar-arbol" element={<BuyTree />} />
             <Route path="mis-arboles" element={<MyTrees />} />
             <Route path="seguimiento" element={<Tracking />} />
+            <Route
+              path="operario"
+              element={
+                <ProtectedRoute allowedRoles={["ADMIN", "OPERARIO"]}>
+                  <Operator />
+                </ProtectedRoute>
+              }
+            />
             <Route path="huella-carbono" element={<CarbonFootprint />} />
             <Route path="perfil" element={<Profile />} />
             <Route
