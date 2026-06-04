@@ -9,6 +9,7 @@ import BuyTree from "./pages/BuyTree";
 import CarbonFootprint from "./pages/CarbonFootprint";
 import ForgotPassword from "./pages/ForgotPassword";
 import Home from "./pages/Home";
+import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import MyTrees from "./pages/MyTrees";
 import Profile from "./pages/Profile";
@@ -23,13 +24,14 @@ createRoot(document.getElementById("root")).render(
     <BrowserRouter>
       <AuthProvider>
         <Routes>
+          <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/tree/public/:qrCode" element={<PublicTree />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route
-            path="/"
+            path="/app"
             element={
               <ProtectedRoute>
                 <AppLayout />

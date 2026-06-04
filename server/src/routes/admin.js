@@ -60,6 +60,7 @@ router.post("/trees", async (request, response, next) => {
       estimatedLocation,
       estimatedCo2,
       estimatedKgCo2PerYear,
+      co2FactorPerMonth,
       stock,
       isActive = true
     } = request.body;
@@ -77,6 +78,7 @@ router.post("/trees", async (request, response, next) => {
         imageUrl,
         estimatedLocation,
         estimatedKgCo2PerYear: Number(estimatedKgCo2PerYear || estimatedCo2) || 0,
+        co2FactorPerMonth: Number(co2FactorPerMonth) || (Number(estimatedKgCo2PerYear || estimatedCo2) || 0) / 12 || 10,
         stock: Number(stock) || 0,
         isActive
       }
@@ -90,7 +92,7 @@ router.post("/trees", async (request, response, next) => {
 
 router.put("/trees/:id", async (request, response, next) => {
   try {
-    const { name, species, description, price, imageUrl, estimatedLocation, estimatedCo2, estimatedKgCo2PerYear, stock, isActive } =
+    const { name, species, description, price, imageUrl, estimatedLocation, estimatedCo2, estimatedKgCo2PerYear, co2FactorPerMonth, stock, isActive } =
       request.body;
     const tree = await prisma.treeProduct.update({
       where: { id: request.params.id },
@@ -102,6 +104,7 @@ router.put("/trees/:id", async (request, response, next) => {
         imageUrl,
         estimatedLocation,
         estimatedKgCo2PerYear: Number(estimatedKgCo2PerYear || estimatedCo2),
+        co2FactorPerMonth: Number(co2FactorPerMonth) || (Number(estimatedKgCo2PerYear || estimatedCo2) || 0) / 12 || 10,
         stock: Number(stock),
         isActive
       }

@@ -13,6 +13,7 @@ function mapTreeProduct(product) {
     location: product.estimatedLocation,
     estimatedCo2: product.estimatedKgCo2PerYear,
     estimatedKgCo2PerYear: product.estimatedKgCo2PerYear,
+    co2FactorPerMonth: product.co2FactorPerMonth,
     stock: product.stock,
     isActive: product.isActive,
     createdAt: product.createdAt,

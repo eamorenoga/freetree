@@ -11,6 +11,7 @@ const emptyTree = {
   imageUrl: "",
   estimatedLocation: "",
   estimatedCo2: "",
+  co2FactorPerMonth: "",
   stock: ""
 };
 
@@ -227,6 +228,15 @@ export default function Admin() {
             value={form.estimatedCo2}
             onChange={(event) => setForm({ ...form, estimatedCo2: event.target.value })}
           />
+          <input
+            className="field"
+            min="0"
+            placeholder="Factor CO2 especie kg/mes"
+            step="0.1"
+            type="number"
+            value={form.co2FactorPerMonth}
+            onChange={(event) => setForm({ ...form, co2FactorPerMonth: event.target.value })}
+          />
         </div>
         <textarea
           className="field min-h-24"
@@ -341,6 +351,7 @@ export default function Admin() {
               <p className="text-sm text-stone-500">
                 Stock {tree.stock} - ${Number(tree.price).toLocaleString("es-CO")} - {tree.estimatedKgCo2PerYear} kg CO2/ano
               </p>
+              <p className="text-sm text-stone-500">Factor especie: {tree.co2FactorPerMonth || 0} kg CO2/mes</p>
               <p className="text-sm text-stone-500">{tree.estimatedLocation}</p>
             </div>
             <div className="flex flex-wrap gap-2">

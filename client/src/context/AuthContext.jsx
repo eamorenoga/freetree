@@ -61,13 +61,18 @@ export function AuthProvider({ children }) {
     });
   }
 
+  function setSession(data) {
+    localStorage.setItem("terrabiocol_token", data.token);
+    setUser(data.user);
+  }
+
   function logout() {
     localStorage.removeItem("terrabiocol_token");
     setUser(null);
   }
 
   const value = useMemo(
-    () => ({ user, loading, login, register, updateProfile, forgotPassword, resetPassword, logout }),
+    () => ({ user, loading, login, register, updateProfile, forgotPassword, resetPassword, setSession, logout }),
     [user, loading]
   );
 

@@ -13,7 +13,7 @@ export default function Login() {
     setError("");
     try {
       await login(form.identifier, form.password);
-      navigate("/");
+      navigate("/app");
     } catch (requestError) {
       setError(requestError.message);
     }

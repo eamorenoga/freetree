@@ -2,13 +2,13 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const menuItems = [
-  { to: "/", label: "Inicio" },
-  { to: "/comprar-arbol", label: "Comprar arbol" },
-  { to: "/mis-arboles", label: "Mis arboles" },
-  { to: "/seguimiento", label: "Seguimiento" },
-  { to: "/huella-carbono", label: "Huella de carbono" },
-  { to: "/perfil", label: "Perfil" },
-  { to: "/admin", label: "Administracion", adminOnly: true }
+  { to: "/app", label: "Inicio" },
+  { to: "/app/comprar-arbol", label: "Comprar arbol" },
+  { to: "/app/mis-arboles", label: "Mis arboles" },
+  { to: "/app/seguimiento", label: "Seguimiento" },
+  { to: "/app/huella-carbono", label: "Huella de carbono" },
+  { to: "/app/perfil", label: "Perfil" },
+  { to: "/app/admin", label: "Administracion", adminOnly: true }
 ];
 
 export default function AppLayout() {
@@ -34,7 +34,7 @@ export default function AppLayout() {
               <NavLink
                 key={item.to}
                 to={item.to}
-                end={item.to === "/"}
+                end={item.to === "/app"}
                 className={({ isActive }) =>
                   `rounded-lg px-3 py-2 text-sm font-semibold ${
                     isActive ? "bg-forest text-white" : "text-stone-600 hover:bg-stone-100 hover:text-forest"

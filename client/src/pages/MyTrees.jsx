@@ -1,5 +1,21 @@
 import { useApiResource } from "../hooks/useApiResource";
 
+function buildCertificateUrl(item) {
+  const certificate = [
+    "CERTIFICADO DIGITAL TERRABIOCOL",
+    `Arbol: ${item.tree.name || item.tree.species}`,
+    `Especie: ${item.tree.species}`,
+    `Estado: ${item.status}`,
+    `Ubicacion: ${item.location}`,
+    `QR: ${item.qrCode?.code || "No disponible"}`,
+    `URL publica: ${item.qrCode?.publicUrl || "No disponible"}`,
+    `CO2 estimado: ${item.carbonFootprint?.estimatedKgCo2 || item.tree.estimatedCo2} kg`,
+    "Este documento es una evidencia digital informativa y no reemplaza una certificacion ambiental oficial."
+  ].join("\n");
+
+  return `data:text/plain;charset=utf-8,${encodeURIComponent(certificate)}`;
+}
+
 export default function MyTrees() {
   const { data, loading, error } = useApiResource("/my-trees", { userTrees: [] });
 
@@ -72,6 +88,9 @@ export default function MyTrees() {
                   </a>
                   <a className="btn-primary" download={`qr-${item.qrCode.code}.png`} href={item.qrCode.imageUrl}>
                     Descargar
+                  </a>
+                  <a className="btn-secondary" download={`certificado-${item.qrCode.code}.txt`} href={buildCertificateUrl(item)}>
+                    Certificado
                   </a>
                 </div>
               ) : null}

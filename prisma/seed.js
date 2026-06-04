@@ -71,6 +71,7 @@ async function main() {
       imageUrl: "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?auto=format&fit=crop&w=1200&q=80",
       estimatedLocation: "Corredores verdes urbanos, Cundinamarca",
       estimatedKgCo2PerYear: 120,
+      co2FactorPerMonth: 10,
       stock: 45,
       isActive: true
     }),
@@ -83,6 +84,7 @@ async function main() {
       imageUrl: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=1200&q=80",
       estimatedLocation: "Reserva La Esperanza, Cundinamarca",
       estimatedKgCo2PerYear: 180,
+      co2FactorPerMonth: 15,
       stock: 30,
       isActive: true
     }),
@@ -95,6 +97,7 @@ async function main() {
       imageUrl: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1200&q=80",
       estimatedLocation: "Zonas de recuperacion de suelos, Antioquia",
       estimatedKgCo2PerYear: 95,
+      co2FactorPerMonth: 7.9,
       stock: 60,
       isActive: true
     })

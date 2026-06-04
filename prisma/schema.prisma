@@ -65,6 +65,7 @@ model TreeProduct {
   imageUrl             String
   estimatedLocation    String         @default("Pendiente de asignacion por TerraBioCol")
   estimatedKgCo2PerYear Float
+  co2FactorPerMonth    Float          @default(10)
   stock                Int
   isActive             Boolean        @default(true)
   createdAt            DateTime       @default(now())
