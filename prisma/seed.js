@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 require("../server/src/config/env").requireEnvironment();
 const { PrismaClient, PaymentStatus, TreeStatus, UserRole } = require("@prisma/client");
+const { getQrImageUrl } = require("../server/src/lib/qr");
 
 const prisma = new PrismaClient();
 
@@ -68,6 +69,7 @@ async function main() {
       description: "Arbol nativo ornamental que apoya polinizadores y mejora corredores verdes urbanos.",
       price: 69000,
       imageUrl: "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?auto=format&fit=crop&w=1200&q=80",
+      estimatedLocation: "Corredores verdes urbanos, Cundinamarca",
       estimatedKgCo2PerYear: 120,
       stock: 45,
       isActive: true
@@ -79,6 +81,7 @@ async function main() {
       description: "Especie de alto valor ecologico para restauracion y captura de carbono a largo plazo.",
       price: 89000,
       imageUrl: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=1200&q=80",
+      estimatedLocation: "Reserva La Esperanza, Cundinamarca",
       estimatedKgCo2PerYear: 180,
       stock: 30,
       isActive: true
@@ -90,6 +93,7 @@ async function main() {
       description: "Arbol pionero ideal para recuperacion de suelos y refugio de fauna local.",
       price: 54000,
       imageUrl: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1200&q=80",
+      estimatedLocation: "Zonas de recuperacion de suelos, Antioquia",
       estimatedKgCo2PerYear: 95,
       stock: 60,
       isActive: true
@@ -130,8 +134,9 @@ async function main() {
     update: {},
     create: {
       treePurchaseId: purchase.id,
+      treeProductId: products[0].id,
       code: "TBC-QR-DEMO-GUAYACAN-0001",
-      imageUrl: "https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=TBC-QR-DEMO-GUAYACAN-0001"
+      imageUrl: getQrImageUrl("TBC-QR-DEMO-GUAYACAN-0001")
     }
   });
 

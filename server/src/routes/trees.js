@@ -17,4 +17,20 @@ router.get("/", async (_request, response, next) => {
   }
 });
 
+router.get("/:id", async (request, response, next) => {
+  try {
+    const tree = await prisma.treeProduct.findFirst({
+      where: { id: request.params.id, isActive: true }
+    });
+
+    if (!tree) {
+      return response.status(404).json({ message: "Arbol no encontrado" });
+    }
+
+    response.json({ tree: mapTreeProduct(tree) });
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;

@@ -63,12 +63,14 @@ model TreeProduct {
   description          String
   price                Decimal        @db.Decimal(10, 2)
   imageUrl             String
+  estimatedLocation    String         @default("Pendiente de asignacion por TerraBioCol")
   estimatedKgCo2PerYear Float
   stock                Int
   isActive             Boolean        @default(true)
   createdAt            DateTime       @default(now())
   updatedAt            DateTime       @updatedAt
   purchases            TreePurchase[]
+  qrCodes              QRCode[]
 }
 
 model TreePurchase {
@@ -130,11 +132,13 @@ model TreePhoto {
 
 model QRCode {
   id             String       @id @default(cuid())
-  treePurchaseId String       @unique
+  treePurchaseId String?      @unique
+  treeProductId  String?
   code           String       @unique
   imageUrl       String?
   createdAt      DateTime     @default(now())
-  treePurchase   TreePurchase @relation(fields: [treePurchaseId], references: [id], onDelete: Cascade)
+  treePurchase   TreePurchase? @relation(fields: [treePurchaseId], references: [id], onDelete: Cascade)
+  treeProduct    TreeProduct?  @relation(fields: [treeProductId], references: [id], onDelete: SetNull)
 }
 
 model CarbonFootprint {

@@ -1,3 +1,5 @@
+const { getPublicTreeUrl } = require("./qr");
+
 function mapTreeProduct(product) {
   return {
     id: product.id,
@@ -6,6 +8,8 @@ function mapTreeProduct(product) {
     description: product.description,
     price: product.price,
     imageUrl: product.imageUrl,
+    estimatedLocation: product.estimatedLocation,
+    location: product.estimatedLocation,
     estimatedCo2: product.estimatedKgCo2PerYear,
     estimatedKgCo2PerYear: product.estimatedKgCo2PerYear,
     stock: product.stock,
@@ -31,7 +35,8 @@ function mapTreePurchase(purchase) {
     tree: purchase.treeProduct ? mapTreeProduct(purchase.treeProduct) : undefined,
     treeProduct: purchase.treeProduct ? mapTreeProduct(purchase.treeProduct) : undefined,
     trackingEvents: purchase.trackingEvents ? purchase.trackingEvents.map(mapTreeTracking) : [],
-    qrCode: purchase.qrCode,
+    qrCode: purchase.qrCode ? { ...purchase.qrCode, publicUrl: getPublicTreeUrl(purchase.qrCode.code) } : purchase.qrCode,
+    carbonFootprint: purchase.carbonFootprint,
     payment: purchase.payment
   };
 }

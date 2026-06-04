@@ -12,6 +12,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import MyTrees from "./pages/MyTrees";
 import Profile from "./pages/Profile";
+import PublicTree from "./pages/PublicTree";
 import Register from "./pages/Register";
 import ResetPassword from "./pages/ResetPassword";
 import Tracking from "./pages/Tracking";
@@ -23,6 +24,7 @@ createRoot(document.getElementById("root")).render(
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/tree/public/:qrCode" element={<PublicTree />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />

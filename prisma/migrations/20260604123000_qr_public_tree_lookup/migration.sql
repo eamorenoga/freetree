@@ -1,0 +1,8 @@
+ALTER TABLE "QRCode" DROP CONSTRAINT "QRCode_treePurchaseId_fkey";
+
+ALTER TABLE "QRCode"
+ALTER COLUMN "treePurchaseId" DROP NOT NULL,
+ADD COLUMN "treeProductId" TEXT;
+
+ALTER TABLE "QRCode" ADD CONSTRAINT "QRCode_treePurchaseId_fkey" FOREIGN KEY ("treePurchaseId") REFERENCES "TreePurchase"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "QRCode" ADD CONSTRAINT "QRCode_treeProductId_fkey" FOREIGN KEY ("treeProductId") REFERENCES "TreeProduct"("id") ON DELETE SET NULL ON UPDATE CASCADE;
