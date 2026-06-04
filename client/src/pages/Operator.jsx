@@ -32,8 +32,45 @@ export default function Operator() {
   const videoRef = useRef(null);
   const scannerTimerRef = useRef(null);
   const scannerStreamRef = useRef(null);
+  const scannerDetectorRef = useRef(null);
 
   useEffect(() => () => stopScanner(), []);
+
+  useEffect(() => {
+    if (!scannerActive || !videoRef.current || !scannerStreamRef.current || !scannerDetectorRef.current) {
+      return;
+    }
+
+    let cancelled = false;
+
+    async function attachScannerStream() {
+      const video = videoRef.current;
+      video.srcObject = scannerStreamRef.current;
+      video.setAttribute("playsinline", "true");
+      await video.play();
+
+      scannerTimerRef.current = window.setInterval(async () => {
+        if (cancelled || !videoRef.current || videoRef.current.readyState < 2) return;
+
+        const codes = await scannerDetectorRef.current.detect(videoRef.current);
+        const scannedCode = normalizeScannedValue(codes[0]?.rawValue);
+
+        if (scannedCode) {
+          setQrSearch(scannedCode);
+          stopScanner();
+        }
+      }, 900);
+    }
+
+    attachScannerStream().catch(() => {
+      setMessage("No fue posible mostrar la camara. Ingresa el codigo QR manualmente.");
+      stopScanner();
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [scannerActive]);
 
   function normalizeScannedValue(rawValue) {
     return decodeURIComponent(rawValue?.split("/tree/public/")[1] || rawValue || "").trim();
@@ -57,6 +94,7 @@ export default function Operator() {
     scannerStreamRef.current?.getTracks().forEach((track) => track.stop());
     scannerTimerRef.current = null;
     scannerStreamRef.current = null;
+    scannerDetectorRef.current = null;
     setScannerActive(false);
   }
 
@@ -72,24 +110,8 @@ export default function Operator() {
       const detector = new window.BarcodeDetector({ formats: ["qr_code"] });
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
       scannerStreamRef.current = stream;
+      scannerDetectorRef.current = detector;
       setScannerActive(true);
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      }
-
-      scannerTimerRef.current = window.setInterval(async () => {
-        if (!videoRef.current) return;
-
-        const codes = await detector.detect(videoRef.current);
-        const scannedCode = normalizeScannedValue(codes[0]?.rawValue);
-
-        if (scannedCode) {
-          setQrSearch(scannedCode);
-          stopScanner();
-        }
-      }, 900);
     } catch (_error) {
       setMessage("No fue posible abrir la camara. Ingresa el codigo QR manualmente.");
       stopScanner();
@@ -106,6 +128,44 @@ export default function Operator() {
 
     const photoData = await readFileAsDataUrl(file);
     setProgressForm({ ...progressForm, photoData, photoMimeType: file.type, fileName: file.name });
+  }
+
+  async function scanQrFromImage(event) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!file) {
+      return;
+    }
+
+    if (!("BarcodeDetector" in window)) {
+      setMessage("Este navegador no soporta lectura QR desde imagen. Ingresa el codigo manualmente.");
+      return;
+    }
+
+    const imageUrl = URL.createObjectURL(file);
+
+    try {
+      const image = new Image();
+      image.src = imageUrl;
+      await image.decode();
+
+      const detector = new window.BarcodeDetector({ formats: ["qr_code"] });
+      const codes = await detector.detect(image);
+
+      const scannedCode = normalizeScannedValue(codes[0]?.rawValue);
+      if (!scannedCode) {
+        setMessage("No encontre un QR legible en la imagen.");
+        return;
+      }
+
+      setQrSearch(scannedCode);
+      setMessage("QR leido desde imagen. Presiona Buscar para cargar el arbol.");
+    } catch (_error) {
+      setMessage("No fue posible leer el QR desde la imagen.");
+    } finally {
+      URL.revokeObjectURL(imageUrl);
+    }
   }
 
   async function submitProgress(event) {
@@ -153,6 +213,10 @@ export default function Operator() {
           </button>
           <button className="btn-primary" type="submit">Buscar</button>
         </form>
+        <label className="btn-secondary w-fit cursor-pointer">
+          Escanear desde imagen
+          <input accept="image/*" className="hidden" onChange={scanQrFromImage} type="file" />
+        </label>
         {scannerActive ? <video className="h-72 w-full rounded-lg bg-black object-cover" muted playsInline ref={videoRef} /> : null}
       </section>
 
