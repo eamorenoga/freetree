@@ -1,3 +1,5 @@
+import PageHeader from "../components/PageHeader";
+import TimelineList from "../components/TimelineList";
 import { useApiResource } from "../hooks/useApiResource";
 
 function buildCertificateUrl(item) {
@@ -21,10 +23,11 @@ export default function MyTrees() {
 
   return (
     <section>
-      <div className="mb-6">
-        <p className="text-sm font-semibold text-moss">Propiedad ambiental</p>
-        <h2 className="text-3xl font-bold text-forest">Mis arboles</h2>
-      </div>
+      <PageHeader
+        eyebrow="Propiedad ambiental"
+        title="Mis arboles"
+        description="Consulta estado, QR, certificado digital, fotos y monitoreo de cada arbol comprado."
+      />
       {error ? <p className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
       {loading ? <p>Cargando tus arboles...</p> : null}
       <div className="grid gap-4">
@@ -48,28 +51,8 @@ export default function MyTrees() {
 
               <div className="mt-5">
                 <h4 className="font-bold text-forest">Linea de tiempo</h4>
-                <div className="mt-3 grid gap-3">
-                  {item.trackingEvents.length === 0 ? <p className="text-sm text-stone-500">Aun no hay eventos registrados.</p> : null}
-                  {item.trackingEvents.map((event) => (
-                    <div className="rounded-lg border border-stone-200 p-3" key={event.id}>
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <p className="text-sm font-bold text-forest">{event.title}</p>
-                        <p className="text-xs font-semibold text-stone-500">{new Date(event.eventDate).toLocaleDateString("es-CO")}</p>
-                      </div>
-                      <p className="mt-2 text-sm text-stone-600">{event.description}</p>
-                      {event.location ? <p className="mt-1 text-sm font-semibold text-stone-700">{event.location}</p> : null}
-                      {event.photos?.length ? (
-                        <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                          {event.photos.map((photo) => (
-                            <figure key={photo.id}>
-                              <img className="h-36 w-full rounded-lg object-cover" src={photo.imageUrl} alt={photo.caption || event.title} />
-                              {photo.caption ? <figcaption className="mt-1 text-xs text-stone-500">{photo.caption}</figcaption> : null}
-                            </figure>
-                          ))}
-                        </div>
-                      ) : null}
-                    </div>
-                  ))}
+                <div className="mt-3">
+                  <TimelineList events={item.trackingEvents} />
                 </div>
               </div>
             </div>

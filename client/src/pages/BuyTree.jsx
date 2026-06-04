@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import PageHeader from "../components/PageHeader";
+import TreeCard from "../components/TreeCard";
 import { useApiResource } from "../hooks/useApiResource";
 import { apiRequest } from "../lib/api";
 
@@ -88,10 +90,11 @@ export default function BuyTree() {
 
   return (
     <section>
-      <div className="mb-6">
-        <p className="text-sm font-semibold text-moss">Catalogo</p>
-        <h2 className="text-3xl font-bold text-forest">Comprar arbol</h2>
-      </div>
+      <PageHeader
+        eyebrow="Catalogo"
+        title="Comprar arbol"
+        description="Elige especies disponibles, arma tu carrito y genera QR de seguimiento al aprobar la compra."
+      />
       {message ? <p className="mb-4 rounded-lg bg-green-50 px-4 py-3 text-sm text-forest">{message}</p> : null}
       {error ? <p className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
       {loading ? <p>Cargando catalogo...</p> : null}
@@ -99,47 +102,20 @@ export default function BuyTree() {
       <div className="grid gap-6 xl:grid-cols-[1fr_22rem]">
         <div className="grid gap-5 md:grid-cols-2">
           {data.trees.map((tree) => (
-            <article className="card overflow-hidden" key={tree.id}>
-              <img className="h-48 w-full object-cover" src={tree.imageUrl} alt={tree.species} />
-              <div className="p-5">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-forest">{tree.name}</h3>
-                    <p className="text-sm font-semibold text-moss">{tree.species}</p>
-                  </div>
-                  <p className="rounded-full bg-green-50 px-3 py-1 text-sm font-bold text-leaf">
-                    ${Number(tree.price).toLocaleString("es-CO")}
-                  </p>
-                </div>
-                <p className="mt-3 text-sm text-stone-600">{tree.description}</p>
-                <dl className="mt-4 grid gap-3 text-sm text-stone-600 sm:grid-cols-2">
-                  <div>
-                    <dt className="font-semibold text-forest">Ubicacion estimada</dt>
-                    <dd>{tree.estimatedLocation}</dd>
-                  </div>
-                  <div>
-                    <dt className="font-semibold text-forest">CO2 estimado</dt>
-                    <dd>{tree.estimatedCo2} kg por ano</dd>
-                  </div>
-                  <div>
-                    <dt className="font-semibold text-forest">Stock</dt>
-                    <dd>{tree.stock} disponibles</dd>
-                  </div>
-                </dl>
-                <div className="mt-5 grid grid-cols-2 gap-3">
-                  <button className="btn-secondary" onClick={() => setSelectedTree(tree)} type="button">
-                    Detalle
-                  </button>
-                  <button className="btn-primary" onClick={() => addToCart(tree.id)} disabled={tree.stock <= 0} type="button">
-                    Agregar
-                  </button>
-                </div>
+            <TreeCard key={tree.id} tree={tree}>
+              <div className="grid grid-cols-2 gap-3">
+                <button className="btn-secondary" onClick={() => setSelectedTree(tree)} type="button">
+                  Detalle
+                </button>
+                <button className="btn-primary" onClick={() => addToCart(tree.id)} disabled={tree.stock <= 0} type="button">
+                  Agregar
+                </button>
               </div>
-            </article>
+            </TreeCard>
           ))}
         </div>
 
-        <aside className="card h-fit p-5">
+        <aside className="card h-fit p-5 xl:sticky xl:top-24">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-sm font-semibold text-moss">Carrito</p>

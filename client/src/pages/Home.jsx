@@ -1,4 +1,5 @@
 import MetricCard from "../components/MetricCard";
+import PageHeader from "../components/PageHeader";
 import { useAuth } from "../context/AuthContext";
 import { useApiResource } from "../hooks/useApiResource";
 
@@ -13,10 +14,11 @@ export default function Home() {
 
   return (
     <section>
-      <div className="mb-6">
-        <p className="text-sm font-semibold text-moss">Dashboard cliente</p>
-        <h2 className="text-3xl font-bold text-forest">Tu bosque personal</h2>
-      </div>
+      <PageHeader
+        eyebrow="Dashboard cliente"
+        title="Tu bosque personal"
+        description="Consulta compras, monitoreo, evidencia y compensacion estimada desde una vista central."
+      />
       <div className="grid gap-4 md:grid-cols-3">
         <MetricCard label="Arboles adquiridos" value={myTrees.data.userTrees.length} detail="Asignados a tu cuenta" />
         <MetricCard label="CO2 estimado" value={`${Math.round(carbon.data.summary.estimatedKgCo2)} kg`} detail="Compensacion proyectada" />
@@ -48,10 +50,11 @@ function AdminHome() {
 
   return (
     <section>
-      <div className="mb-6">
-        <p className="text-sm font-semibold text-moss">Dashboard administrador</p>
-        <h2 className="text-3xl font-bold text-forest">Operacion TerraBioCol</h2>
-      </div>
+      <PageHeader
+        eyebrow="Dashboard administrador"
+        title="Operacion TerraBioCol"
+        description="Gestiona catalogo, ventas, usuarios, QR y seguimiento ambiental."
+      />
       <div className="grid gap-4 md:grid-cols-4">
         <MetricCard label="Usuarios" value={stats.usersCount || 0} />
         <MetricCard label="Ventas" value={stats.ordersCount || 0} />

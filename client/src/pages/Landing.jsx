@@ -115,14 +115,14 @@ export default function Landing() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-6xl gap-5 px-4 py-10 md:grid-cols-4 lg:px-8">
+      <section className="mx-auto grid max-w-6xl gap-5 px-4 py-10 md:grid-cols-2 lg:grid-cols-4 lg:px-8">
         {[
           ["Venta directa", "Compra arboles para compensacion ambiental individual o empresarial."],
           ["Monitoreo", "Consulta estado, ubicacion, fotos y progreso por linea de tiempo."],
           ["Impacto", "Revisa CO2 mensual, anual, acumulado y equivalencias simples."],
           ["Certificados digitales", "Accede al QR publico y evidencia descargable de tus arboles."]
         ].map(([title, description]) => (
-          <article className="card p-5" key={title}>
+          <article className="card p-5 transition hover:-translate-y-0.5 hover:shadow-md" key={title}>
             <h3 className="font-bold text-forest">{title}</h3>
             <p className="mt-2 text-sm text-stone-600">{description}</p>
           </article>

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import PageHeader from "../components/PageHeader";
+import TimelineList from "../components/TimelineList";
 import { useApiResource } from "../hooks/useApiResource";
 import { apiRequest } from "../lib/api";
 
@@ -24,10 +26,11 @@ export default function Tracking() {
 
   return (
     <section>
-      <div className="mb-6">
-        <p className="text-sm font-semibold text-moss">Monitoreo</p>
-        <h2 className="text-3xl font-bold text-forest">Seguimiento</h2>
-      </div>
+      <PageHeader
+        eyebrow="Monitoreo"
+        title="Seguimiento"
+        description="Registra avances y consulta la linea de tiempo visual de tus arboles."
+      />
       <form className="card mb-6 grid gap-4 p-5" onSubmit={handleSubmit}>
         <h3 className="text-lg font-bold text-forest">Registrar evento</h3>
         {message ? <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-forest">{message}</p> : null}
@@ -46,16 +49,7 @@ export default function Tracking() {
         />
         <button className="btn-primary w-fit" type="submit">Guardar evento</button>
       </form>
-      <div className="grid gap-4">
-        {events.data.events.map((event) => (
-          <article className="card p-5" key={event.id}>
-            <p className="text-xs font-semibold uppercase tracking-wide text-moss">{new Date(event.eventDate).toLocaleDateString("es-CO")}</p>
-            <h3 className="mt-1 text-lg font-bold text-forest">{event.title}</h3>
-            <p className="mt-2 text-sm text-stone-600">{event.description}</p>
-            <p className="mt-3 text-sm font-semibold text-stone-700">{event.userTree.tree.species}</p>
-          </article>
-        ))}
-      </div>
+      <TimelineList events={events.data.events} />
     </section>
   );
 }

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import MetricCard from "../components/MetricCard";
+import PageHeader from "../components/PageHeader";
 import { useApiResource } from "../hooks/useApiResource";
 import { apiRequest } from "../lib/api";
 
@@ -32,10 +33,11 @@ export default function CarbonFootprint() {
 
   return (
     <section>
-      <div className="mb-6">
-        <p className="text-sm font-semibold text-moss">Impacto ambiental</p>
-        <h2 className="text-3xl font-bold text-forest">Huella de carbono</h2>
-      </div>
+      <PageHeader
+        eyebrow="Impacto ambiental"
+        title="Huella de carbono"
+        description="Analiza CO2 mensual, anual, acumulado y equivalencias por arbol y por usuario."
+      />
       <div className="grid gap-4 md:grid-cols-2">
         <MetricCard label="Arboles activos" value={data.summary.activeTreesCount || data.summary.treesCount} />
         <MetricCard label="CO2 mensual estimado" value={`${Math.round(data.summary.monthlyKgCo2)} kg`} />

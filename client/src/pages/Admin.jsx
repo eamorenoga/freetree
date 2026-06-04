@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import MetricCard from "../components/MetricCard";
+import PageHeader from "../components/PageHeader";
 import { useApiResource } from "../hooks/useApiResource";
 import { apiRequest } from "../lib/api";
 
@@ -181,10 +182,11 @@ export default function Admin() {
 
   return (
     <section>
-      <div className="mb-6">
-        <p className="text-sm font-semibold text-moss">Panel protegido</p>
-        <h2 className="text-3xl font-bold text-forest">Administracion</h2>
-      </div>
+      <PageHeader
+        eyebrow="Panel protegido"
+        title="Administracion"
+        description="Administra catalogo, QR, seguimiento, fotos y metricas de la operacion."
+      />
       <div className="grid gap-4 md:grid-cols-4">
         <MetricCard label="Usuarios" value={stats.usersCount || 0} />
         <MetricCard label="Ordenes" value={stats.ordersCount || 0} />
